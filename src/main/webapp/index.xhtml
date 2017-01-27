@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<link rel="stylesheet"
+		href="webjars/bpmn-js/0.13.1/assets/diagram-js.css" />
+	<title>Camunda Demo Data Generator</title>
+</h:head>
+<h:body>
+	<h:form id="mainForm">
+		<ui:include src="startconfiguration.xhtml" />
+		<!-- to draw on -->
+		<div class="content" id="js-canvas-div">
+			<div id="js-canvas">
+				<script type="text/javascript"
+					src="webjars/bpmn-js/0.13.1/bpmn-navigated-viewer.js"></script>
+				<script type="text/javascript" src="viewer.js"></script>
+				<p:remoteCommand name="updateFields"
+					action="#{startController.updateFields()}" update="bpmnConfig" />
+				<h:outputScript id="renderBpmnScript">#{startController.bpmnDiagramAsJS}</h:outputScript>
+			</div>
+		</div>
+		<h:panelGrid columns="2" id="bpmnConfig">
+			<h:panelGrid columns="2">
+				<h:outputText value="Element: "
+					rendered="#{startController.elementId != null}" />
+				<h:outputText value="#{startController.elementId}"
+					rendered="#{startController.elementId != null}" />
+				<h:outputText value="Mean" rendered="#{startController.isTask()}" />
+				<p:inputText required="false"
+					requiredMessage="Mean Time is reuqired"
+					value="#{startController.meanElement}" id="mean"
+					title="Mean Time in seconds" rendered="#{startController.isTask()}" />
+				<h:outputText value="Sd" rendered="#{startController.isTask()}" />
+				<p:inputText required="false" requiredMessage="SD is required"
+					value="#{startController.sdElement}" id="sd" title="SD in seconds"
+					rendered="#{startController.isTask()}" />
+				<h:outputText value="Probability"
+					rendered="#{startController.isSequenceFlow()
+                         or startController.isBoundaryEvent()
+                         or startController.isStartEvent()}" />
+				<p:inputText required="false"
+					requiredMessage="Probability is required"
+					value="#{startController.elementProbability}" id="probability"
+					title="Probability for the Element in Percent (0-100)"
+					rendered="#{startController.isSequenceFlow()
+                        or startController.isBoundaryEvent()
+                        or startController.isStartEvent()}" />
+			</h:panelGrid>
+			<p:dataTable emptyMessage="No Process Variables for this step added"
+				var="var" value="#{startController.processVariables}"
+				rowIndexVar="indexVar" sortBy="#{var.name}" rows="10"
+				paginator="true"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15,30,50" editable="true" editMode="cell"
+				id="innerTable"
+				rendered="#{startController.isBoundaryEvent()
+	                       or startController.isStartEvent()
+	                       or startController.isEndEvent()
+	                       or startController.isTask()}">
+
+				<p:column headerText="Name" sortBy="#{var.name}">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{var.name}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{var.name}" required="true"
+								title="Variable Name"
+								requiredMessage="Name for the Process Variable is required" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+
+				<p:column headerText="Type" sortBy="#{var.type}">
+					<p:selectOneMenu id="type" value="#{var.type}" required="true">
+						<f:selectItems value="#{startController.processVariableTypes}" />
+						<p:ajax update="@this" />
+					</p:selectOneMenu>
+				</p:column>
+				<p:column>
+					<p:commandButton value="remove" id="ajax"
+						update="mainForm:innerTable"
+						actionListener="#{startController.removeProcessVariable(var)}" />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Add new Process Variable"
+				update="mainForm:innerTable"
+				actionListener="#{startController.addProcessVariable()}"
+				rendered="#{startController.isBoundaryEvent()
+	                        or startController.isStartEvent() 
+	                        or startController.isEndEvent()
+	                        or startController.isTask()}" />
+		</h:panelGrid>
+		<p:commandButton value="Submit" update="growl"
+			actionListener="#{startController.start()}" process="@form" />
+	</h:form>
+</h:body>
+</html>

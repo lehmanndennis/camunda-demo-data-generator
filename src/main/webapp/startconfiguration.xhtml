@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+    <p:growl id="growl" life="5000" showDetail="true"/>
+    <h:panelGrid columns="3">
+        <p:outputLabel value="Process"/>
+        <p:selectOneMenu id="processDefSelection"
+                         value="#{startController.processDefinitionKey}" effect="fade" filter="true"
+                         filterMatchMode="startsWith" required="true">
+            <f:selectItem itemLabel="Select Process" itemValue=""/>
+            <f:selectItems value="#{startController.getProcessDefinitions()}" var="procDef"
+                           itemLabel="#{procDef.name}" itemValue="#{procDef.key}"/>
+            <p:ajax partialSubmit="true" process="processDefSelection" update="procDefVersion"
+                    listener="#{startController.reset()}"/>
+        </p:selectOneMenu>
+        <p:commandButton value="Delete" update="growl"
+                         actionListener="#{startController.deleteInstances()}"
+                         partialSubmit="true"
+                         process="@this,processDefSelection,procDefVersion"/>
+        <p:outputLabel value="Version"/>
+        <p:selectOneMenu id="procDefVersion"
+                         value="#{startController.procDefVersion}" effect="fade" filter="true"
+                         filterMatchMode="startsWith" required="true" onchange="submit()">
+            <f:selectItem itemLabel="Select Version" itemValue=""/>
+            <f:selectItems value="#{startController.getVersions()}" var="processVersions"
+                           itemLabel="#{processVersions.version}"
+                           itemValue="#{processVersions.version}"/>
+        </p:selectOneMenu>
+        <p:outputLabel/>
+	    <p:outputLabel value="Start new processes only during working hours" 
+	    				title="Specifies if new processes are only started during working hours (Mo-Fr, 8:00-17:00)" />
+	    <p:selectBooleanCheckbox value="#{startController.useWorkdaysForNewProcesses}" 
+	                             title="Specifies if new processes are only started during working hours (Mo-Fr, 8:00-17:00)" />
+	    <p:outputLabel/>
+	    <p:outputLabel value="End Usertasks only during working hours" 
+	    				title="Specifies if the Usertask is only ended during working hours (Mo-Fr, 8:00-17:00)"/>
+	    <p:selectBooleanCheckbox value="#{startController.useWorkdaysForUsertasks}"
+	                             title="Specifies if the Usertask is only ended during working hours (Mo-Fr, 8:00-17:00)"/>
+	    <p:outputLabel/>
+
+        <p:outputLabel value="Start Date"/>
+        <p:calendar id="dateSelection" value="#{startController.startDate}" required="true"/>
+        <p:outputLabel/>
+        <p:outputLabel value="Number of instances"/>
+        <p:inputText required="true"
+                     requiredMessage="Number of process instances required"
+                     value="#{startController.numberOfInstances}"
+                     id="processInstances"
+                     title="Number of process instances"/>
+        <p:outputLabel/>
+        <p:outputLabel value="Mean Distribution between instance starts"/>
+        <p:inputText required="true"
+                     requiredMessage="Mean Distribution is required"
+                     value="#{startController.meanBetweenStarts}" id="timeBetweenStartsBusinessDaysMean"
+                     title="Mean Time"/>
+        <p:outputLabel value="in seconds"/>
+        <p:outputLabel value="Standard Deviation between instance starts"/>
+        <p:inputText required="true"
+                     requiredMessage="Standard Deviation is required"
+                     value="#{startController.sdBetweenStarts}" id="timeBetweenStartsBusinessDaysSd"
+                     title="Standard Deviation"/>
+        <p:outputLabel value="in seconds"/>
+    </h:panelGrid>
+</ui:composition>
