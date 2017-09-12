@@ -43,14 +43,14 @@ public class Helper {
 
 	public static final int BOUNDARY_POSSIBILITY = 25;
 
-	public static final NormalDistribution DEFAULT = new NormalDistribution(DEFAULT_MEAN, DEFAULT_SD);
+	public static final NormalDistribution DISTRIBUTION_DEFAULT = new NormalDistribution(DEFAULT_MEAN, DEFAULT_SD);
 	private static final Random RANDOM = new Random();
 	private static final int MAX_PROBABILITY = 100;
 	private final Map<ModelElementInstance, NormalDistribution> distributions = new HashMap<>();
 	private NormalDistribution nextInstanceStartDistribution;
 	private Map<ModelElementInstance, RandomSelector<ConfigurationEntry>> randomSelectors = new HashMap<>();
 	private DemoDataGeneratorConfig config;
-	Map<Object, List<StartEvent>> startEvents = new HashMap<>();
+	private Map<Object, List<StartEvent>> startEvents = new HashMap<>();
 
 	public Helper(DemoDataGeneratorConfig config, BpmnModelInstance bpmnModelInstance) {
 		super();
@@ -64,10 +64,9 @@ public class Helper {
 			NormalDistribution normalDistribution;
 			if (configurationEntry != null) {
 				normalDistribution = new NormalDistribution(configurationEntry.getMean(), configurationEntry.getSd());
-			} else {
-				normalDistribution = DEFAULT;
+				distributions.put(task, normalDistribution);
 			}
-			distributions.put(task, normalDistribution);
+
 		}
 		Collection<Gateway> gateways = bpmnModelInstance.getModelElementsByType(Gateway.class);
 		for (Gateway gateway : gateways) {
@@ -215,11 +214,11 @@ public class Helper {
 
 	private NormalDistribution getDistributionForElement(ModelElementInstance element) {
 		if (element == null)
-			return DEFAULT;
+			return DISTRIBUTION_DEFAULT;
 		String mean = element.getAttributeValue(MEAN);
 		String sd = element.getAttributeValue(SD);
 		if (mean == null || sd == null) {
-			return DEFAULT;
+			return DISTRIBUTION_DEFAULT;
 		}
 		return new NormalDistribution(Double.valueOf(mean), Double.valueOf(sd));
 	}
@@ -234,7 +233,7 @@ public class Helper {
 	 */
 	public long nextInstanceStart(long current) {
 		long offset = Math.round(nextInstanceStartDistribution.sample());
-		offset *= Time.DISTRIBUTION.SECOND.getValue();
+		offset *= Time.SECOND.getValue();
 		current += offset;
 		return current;
 	}
@@ -248,13 +247,13 @@ public class Helper {
 		// weekend
 		if (day == Calendar.SUNDAY || day == Calendar.SATURDAY) {
 			return false;
-		} else if (hour > Time.END_OF_WORKDAY.HOUR.getValue()) {
+		} else if (hour > Time.EndOfWorkday.HOUR.getValue()) {
 			return false;
-		} else if (hour == Time.END_OF_WORKDAY.HOUR.getValue() && minute > Time.END_OF_WORKDAY.MINUTE.getValue()) {
+		} else if (hour == Time.EndOfWorkday.HOUR.getValue() && minute > Time.EndOfWorkday.MINUTE.getValue()) {
 			return false;
-		} else if (hour < Time.START_OF_WORKDAY.HOUR.getValue()) {
+		} else if (hour < Time.StartOfWorkday.HOUR.getValue()) {
 			return false;
-		} else if (hour == Time.START_OF_WORKDAY.HOUR.getValue() && minute < Time.START_OF_WORKDAY.MINUTE.getValue()) {
+		} else if (hour == Time.StartOfWorkday.HOUR.getValue() && minute < Time.StartOfWorkday.MINUTE.getValue()) {
 			return false;
 		}
 		return true;
@@ -273,7 +272,7 @@ public class Helper {
 		long endTime = start.getTime();
 		do {
 			long offset = Math.round(getDistributions(element).sample());
-			offset *= Time.DISTRIBUTION.SECOND.getValue();
+			offset *= Time.SECOND.getValue();
 			endTime += offset;
 			if (!(element instanceof UserTask || element instanceof StartEvent)) {
 				break;

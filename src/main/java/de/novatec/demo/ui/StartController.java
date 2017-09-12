@@ -57,10 +57,10 @@ public class StartController implements Serializable {
 	private int numberOfInstances = 10;
 	@Getter
 	@Setter
-	private double meanBetweenStarts = Helper.DEFAULT.getMean();
+	private double meanBetweenStarts = Helper.DISTRIBUTION_DEFAULT.getMean();
 	@Getter
 	@Setter
-	private double sdBetweenStarts = Helper.DEFAULT.getStandardDeviation();
+	private double sdBetweenStarts = Helper.DISTRIBUTION_DEFAULT.getStandardDeviation();
 	@Getter
 	@Setter
 	private Date startDate = new Date();
@@ -87,7 +87,6 @@ public class StartController implements Serializable {
 	@Setter
 	private int elementProbability;
 	@Getter
-	@Setter
 	private List<ProcessVariable> processVariables = new ArrayList<>();
 
 	private Map<String, ConfigurationEntry> elementConfig = new HashMap<>();

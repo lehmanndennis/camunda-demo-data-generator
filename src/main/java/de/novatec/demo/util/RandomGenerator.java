@@ -2,6 +2,8 @@ package de.novatec.demo.util;
 
 import java.util.Random;
 
+import javax.ejb.Singleton;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.BooleanValueImpl;
 import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.DoubleValueImpl;
@@ -11,10 +13,11 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import de.novatec.demo.model.ProcessVariable;
 
+@Singleton
 public class RandomGenerator {
-	private static Random RANDOM = new Random();
+	private static final Random RANDOM = new Random();
 
-	public static TypedValue generate(ProcessVariable processVariable) {
+	public TypedValue generate(ProcessVariable processVariable) {
 		TypedValue value;
 		switch (processVariable.getType()) {
 		case BOOLEAN:

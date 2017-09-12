@@ -69,7 +69,7 @@ import de.novatec.demo.model.ProcessVariable;
 import de.novatec.demo.util.AssigneeHelper;
 import de.novatec.demo.util.Helper;
 import de.novatec.demo.util.RandomGenerator;
-import de.novatec.demo.util.Time.START_OF_WORKDAY;
+import de.novatec.demo.util.Time.StartOfWorkday;
 import lombok.NonNull;
 import lombok.extern.java.Log;
 
@@ -90,6 +90,8 @@ public class DemoDataGenerator implements Serializable {
 
 	@Inject
 	private ProcessEngine processEngine;
+	@Inject
+	private RandomGenerator randomGenerator;
 	private HistoryEventProducer eventProducer;
 	private HistoryEventHandler eventHandler;
 	private DbEntityManager dbEntityManager;
@@ -114,9 +116,9 @@ public class DemoDataGenerator implements Serializable {
 			// set startDate to start of day
 			Calendar cal = Calendar.getInstance();
 			cal.setTimeInMillis(startDate);
-			cal.set(Calendar.HOUR_OF_DAY, START_OF_WORKDAY.HOUR.getValue());
-			cal.set(Calendar.MINUTE, START_OF_WORKDAY.MINUTE.getValue());
-			cal.set(Calendar.SECOND, START_OF_WORKDAY.SECOND.getValue());
+			cal.set(Calendar.HOUR_OF_DAY, StartOfWorkday.HOUR.getValue());
+			cal.set(Calendar.MINUTE, StartOfWorkday.MINUTE.getValue());
+			cal.set(Calendar.SECOND, StartOfWorkday.SECOND.getValue());
 			startDate = cal.getTimeInMillis();
 
 			ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
@@ -333,7 +335,7 @@ public class DemoDataGenerator implements Serializable {
 				var.setExecution(executionEntity);
 				var.setExecutionId(null);
 				var.setName(processVariable.getName());
-				var.setValue(RandomGenerator.generate(processVariable));
+				var.setValue(randomGenerator.generate(processVariable));
 				variableEvents.add(eventProducer.createHistoricVariableCreateEvt(var, executionEntity));
 			}
 			handleEvent(variableEvents.toArray(new HistoryEvent[variableEvents.size()]));

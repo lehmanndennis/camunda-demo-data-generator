@@ -2,40 +2,30 @@ package de.novatec.demo.util;
 
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 
 import de.novatec.demo.model.IProbability;
-import lombok.extern.java.Log;
 
 /**
  * This class is used to get random access with a predefined Probability to an
  * item in a List. Therefore all elements in the List must extend
  * {@link IProbability} to verify that the probability is given. All items in
- * the List must have a summed probability of 100.
+ * the List must have a summed probability of 100 or 0.
  * 
  * @param <T>
  */
-@Log
 public class RandomSelector<T extends IProbability> {
 
 	private static final Random RANDOM = new Random();
-	private List<T> items;
+	private final List<T> items;
 
 	/**
-	 * Initializes the random selector or throws an Exception if the summed
-	 * probability is not 100.
+	 * Initializes the random selector
 	 * 
 	 * @param items
 	 */
 	public RandomSelector(List<T> items) {
 		super();
 		this.items = items;
-		int totalSum = getTotalSum();
-		if (totalSum == 0) {
-			log.log(Level.FINE, "Using defaults");
-		} else if (totalSum != 100) {
-			throw new IllegalArgumentException("Probability not 100%");
-		}
 	}
 
 	/**
@@ -44,8 +34,11 @@ public class RandomSelector<T extends IProbability> {
 	 * @return returns the selected element chosen by probability.
 	 */
 	public T getRandom() {
-		if (getTotalSum() == 0) {
+		if (items.size() == 0) {
 			return null;
+		}
+		if (getTotalSum() == 0) {
+			return items.get(RANDOM.nextInt(items.size()));
 		}
 		int index = RANDOM.nextInt(getTotalSum());
 		int sum = 0;
@@ -64,6 +57,9 @@ public class RandomSelector<T extends IProbability> {
 				continue;
 			}
 			totalSum = totalSum + item.getProbability();
+		}
+		if (totalSum != 0 && totalSum != 100) {
+			throw new IllegalArgumentException("Probability not 100 or 0");
 		}
 		return totalSum;
 	}
