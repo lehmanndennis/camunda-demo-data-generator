@@ -8,11 +8,13 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<properties>
-		<camunda.version>7.6.0</camunda.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-
+	<name>Camunda Demo Data Generator</name>
+	<scm>
+		<url>scm:git:git@github.com/lehmanndennis/camunda-demo-data-generator.git</url>
+		<connection>scm:git:git@github.com/lehmanndennis/camunda-demo-data-generator.git</connection>
+		<developerConnection>scm:git:git@github.com/lehmanndennis/camunda-demo-data-generator.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 	<repositories>
 		<repository>
 			<id>prime-repo</id>
@@ -25,6 +27,11 @@
 			<url>https://app.camunda.com/nexus/content/groups/public</url>
 		</repository>
 	</repositories>
+
+	<properties>
+		<camunda.version>7.6.0</camunda.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
 	<dependencies>
 		<!-- Utility -->
@@ -93,24 +100,30 @@
 			<version>2.9.6</version>
 		</dependency>
 
-		<!-- Jboss -->
+		<!-- JEE -->
 		<dependency>
-			<!-- Java EE 6 Specification -->
-			<groupId>org.jboss.spec</groupId>
-			<artifactId>jboss-javaee-web-6.0</artifactId>
-			<version>3.0.3.Final</version>
-			<type>pom</type>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0</version>
 			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.xalan</groupId>
-					<artifactId>xalan</artifactId>
-				</exclusion>
-			</exclusions>
+		</dependency>
+		<!-- Tests -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.10.19</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.projectlombok</groupId>
