@@ -1,5 +1,5 @@
 var BpmnJS = window.BpmnJS;
-var viewer = new BpmnJS({container: document.querySelector('#js-canvas'), height: 450});
+var viewer = new BpmnJS({container: document.querySelector('#js-canvas'), height: 650});
 function load(diagramXML) {
     viewer.importXML(diagramXML, function (err) {
             if (err) {
